@@ -65,7 +65,7 @@ def save_gps_data_to_file(gps_data, output_file):
 def main():
     directory = "d:\\my_site\\asenic.ru\\photo"
     output_txt_file = "d:\\2020\\gps.txt"
-    output_file = "d:\\2020\\gps.htm"
+    output_file_markers = "d:\\2020\\gps_markers.js"
 
     gps_data = read_gps_data_from_directory(directory)
 
@@ -76,48 +76,18 @@ def main():
     print(f"GPS координаты успешно сохранены в файл {output_txt_file}")
     
     """Генерация HTML файла с картой OpenStreetMap и GPS координатами."""
-    with open(output_file, 'w') as f:
-        f.write('''<!DOCTYPE html>
-<html>
-<head>
-    <title>GPS Coordinates Map</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        #map { height: 600px; }
-    </style>
-</head>
-<body>
-    <h1>GPS Coordinates Map</h1>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([0, 0], 2); // Начальная позиция карты
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-        }).addTo(map);
-''')
+    with open(output_file_markers, 'w') as f:
+        f.write("var locations = [ \n")
         for file_path, lat, lon in gps_data:
         # Заменяем обратные слеши на прямые для корректного URL
             file_path = file_path.replace("d:\\my_site\\" , "http://")
             file_path = file_path.replace('\\', '/')    
             # Отладка: выводим закодированный путь
             print(f"Encoded file path: {file_path}")
-
-            f.write(f'''
-                    var marker = L.marker([{lat}, {lon}]).addTo(map)
-                .bindPopup('<a href="{file_path}" target="_blank">Открыть изображение</a>');
-            ''')
+            f.write(f'    [{lat}, {lon}, "{file_path}"],\n')
     
-        f.write('''
-    </script>
-</body>
-</html>
-''')
+        f.write("] \n")
 
 if __name__ == "__main__":
     main()
-
 
